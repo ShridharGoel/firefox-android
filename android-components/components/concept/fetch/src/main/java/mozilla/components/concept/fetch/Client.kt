@@ -5,6 +5,7 @@
 package mozilla.components.concept.fetch
 
 import android.util.Base64
+import android.util.Log
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.URLDecoder
@@ -57,6 +58,8 @@ abstract class Client {
         }
         return try {
             val dataUri = request.url
+
+            Log.d("Testing Client", dataUri.toString())
 
             val (contentType, bytes) = if (dataUri.contains(DATA_URI_BASE64_EXT)) {
                 dataUri.substringAfter(DATA_URI_SCHEME).substringBefore(DATA_URI_BASE64_EXT) to

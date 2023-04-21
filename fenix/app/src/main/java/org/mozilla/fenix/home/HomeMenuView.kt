@@ -30,6 +30,11 @@ import org.mozilla.fenix.theme.ThemeManager
 import org.mozilla.fenix.whatsnew.WhatsNew
 import java.lang.ref.WeakReference
 import org.mozilla.fenix.GleanMetrics.HomeMenu as HomeMenuMetrics
+import android.net.Uri
+import androidx.fragment.app.FragmentManager
+//import com.fenix.featuregpt.GptFragment
+import mozilla.appservices.fxaclient.Config
+import mozilla.components.feature_gpt.GptFragment
 
 /**
  * Helper class for building the [HomeMenu].
@@ -52,6 +57,7 @@ class HomeMenuView(
     private val navController: NavController,
     private val menuButton: WeakReference<MenuButton>,
     private val hideOnboardingIfNeeded: () -> Unit,
+    private val fragmentManager: FragmentManager?
 ) {
 
     /**
@@ -64,6 +70,7 @@ class HomeMenuView(
             onItemTapped = ::onItemTapped,
             onHighlightPresent = { menuButton.get()?.setHighlight(it) },
             onMenuBuilderChanged = { menuButton.get()?.menuBuilder = it },
+            fragmentManager = fragmentManager
         )
 
         menuButton.get()?.setColorFilter(
@@ -125,13 +132,21 @@ class HomeMenuView(
                 homeActivity.openToBrowserAndLoad(
                     searchTermOrURL =
                     if (context.settings().allowDomesticChinaFxaServer) {
-                        mozilla.appservices.fxaclient.Config.Server.CHINA.contentUrl + "/settings"
+                        Config.Server.CHINA.contentUrl + "/settings"
                     } else {
-                        mozilla.appservices.fxaclient.Config.Server.RELEASE.contentUrl + "/settings"
+                        Config.Server.RELEASE.contentUrl + "/settings"
                     },
                     newTab = true,
                     from = BrowserDirection.FromHome,
                 )
+            }
+            is HomeMenu.Item.SummarizeGPT -> {
+                /*navController.nav(
+                    R.id.homeFragment,
+                    HomeFragmentDirections.openSummarizeGPTFragment(item.pageUrl),
+                )*/
+
+                GptFragment.show(item.fragmentManager, item.pageUrl.toString())
             }
             HomeMenu.Item.Bookmarks -> {
                 navController.nav(

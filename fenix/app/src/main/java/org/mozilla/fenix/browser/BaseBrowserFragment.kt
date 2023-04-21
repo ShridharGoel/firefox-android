@@ -428,6 +428,7 @@ abstract class BaseBrowserFragment :
             interactor = browserToolbarInteractor,
             customTabSession = customTabSessionId?.let { store.state.findCustomTab(it) },
             lifecycleOwner = viewLifecycleOwner,
+            fragmentManager = fragmentManager
         )
 
         toolbarIntegration.set(

@@ -5,10 +5,12 @@
 package org.mozilla.fenix.components.toolbar
 
 import android.content.Context
+import android.net.Uri
 import androidx.annotation.ColorRes
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.Companion.PRIVATE
 import androidx.core.content.ContextCompat.getColor
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Job
@@ -39,6 +41,7 @@ import org.mozilla.fenix.R
 import org.mozilla.fenix.components.accounts.FenixAccountManager
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
+import org.mozilla.fenix.home.HomeMenu
 import org.mozilla.fenix.theme.ThemeManager
 
 /**
@@ -62,6 +65,7 @@ open class DefaultToolbarMenu(
     private val bookmarksStorage: BookmarksStorage,
     private val pinnedSiteStorage: PinnedSiteStorage,
     @get:VisibleForTesting internal val isPinningSupported: Boolean,
+    private val fragmentManager: FragmentManager?
 ) : ToolbarMenu {
 
     private var isCurrentUrlPinned = false
@@ -342,6 +346,18 @@ open class DefaultToolbarMenu(
         handleBookmarkItemTapped()
     }
 
+    private val gptItem = BrowserMenuImageText(
+        imageResource = R.drawable.ic_launcher_foreground,
+        iconTintColorResource = primaryTextColor(),
+        label = context.getString(R.string.browser_menu_gpt_option)
+    ) {
+        val currentTabUrl = context.components.core.store.state.selectedTab?.content?.url
+        val pageUri = currentTabUrl?.let { Uri.parse(it) } ?: return@BrowserMenuImageText
+
+        fragmentManager?.let { ToolbarMenu.Item.SummarizeGPT(it, pageUri) }
+            ?.let { onItemTapped.invoke(it) }
+    }
+
     private val deleteDataOnQuit = BrowserMenuImageText(
         label = context.getString(R.string.delete_browsing_data_on_quit_action),
         imageResource = R.drawable.mozac_ic_quit,
@@ -369,6 +385,7 @@ open class DefaultToolbarMenu(
                 historyItem,
                 downloadsItem,
                 extensionsItem,
+                gptItem,
                 syncMenuItem(),
                 BrowserMenuDivider(),
                 findInPageItem,

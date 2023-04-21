@@ -4,9 +4,12 @@
 
 package org.mozilla.fenix.components.toolbar
 
+import android.net.Uri
+import androidx.fragment.app.FragmentManager
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuItemToolbar
 import org.mozilla.fenix.components.accounts.AccountState
+import org.mozilla.fenix.home.HomeMenu
 
 interface ToolbarMenu {
     sealed class Item {
@@ -35,6 +38,8 @@ interface ToolbarMenu {
         object History : Item()
         object Downloads : Item()
         object NewTab : Item()
+
+        data class SummarizeGPT(val fragmentManager: FragmentManager, val pageUrl: Uri) : Item()
     }
 
     val menuBuilder: BrowserMenuBuilder

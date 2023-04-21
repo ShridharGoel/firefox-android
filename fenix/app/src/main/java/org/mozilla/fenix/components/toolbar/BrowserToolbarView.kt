@@ -33,6 +33,7 @@ import org.mozilla.fenix.utils.Settings
 import org.mozilla.fenix.utils.ToolbarPopupWindow
 import java.lang.ref.WeakReference
 import mozilla.components.browser.toolbar.behavior.ToolbarPosition as MozacToolbarPosition
+import androidx.fragment.app.FragmentManager
 
 @SuppressWarnings("LargeClass")
 class BrowserToolbarView(
@@ -42,6 +43,7 @@ class BrowserToolbarView(
     private val interactor: BrowserToolbarInteractor,
     private val customTabSession: CustomTabSessionState?,
     private val lifecycleOwner: LifecycleOwner,
+    private val fragmentManager: FragmentManager?,
 ) {
 
     @LayoutRes
@@ -156,6 +158,7 @@ class BrowserToolbarView(
                     bookmarksStorage = bookmarkStorage,
                     pinnedSiteStorage = components.core.pinnedSiteStorage,
                     isPinningSupported = isPinningSupported,
+                    fragmentManager = fragmentManager
                 )
                 view.display.setMenuDismissAction {
                     view.invalidateActions()

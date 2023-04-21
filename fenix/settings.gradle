@@ -104,3 +104,5 @@ if (localProperties != null) {
         log("Disabled auto-publication of Glean. Enable it by settings '$settingGleanPath' in local.properties")
     }
 }
+
+include ':feature-gpt'

@@ -5,6 +5,7 @@
 package mozilla.components.browser.engine.gecko.fetch
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import mozilla.components.concept.fetch.Client
 import mozilla.components.concept.fetch.Headers
@@ -26,6 +27,7 @@ import java.net.SocketTimeoutException
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.logging.Logger
 
 /**
  * GeckoView ([GeckoWebExecutor]) based implementation of [Client].
@@ -54,6 +56,8 @@ class GeckoViewFetchClient(
 
         return try {
             val webResponse = executor.fetch(webRequest, request.fetchFlags).poll(readTimeOutMillis)
+
+            Log.d("Testing ViewFetch", webResponse?.toResponse()?.body.toString())
             webResponse?.toResponse() ?: throw IOException("Fetch failed with null response")
         } catch (e: TimeoutException) {
             throw SocketTimeoutException()

@@ -26,6 +26,7 @@ import mozilla.components.feature.session.SessionFeature
 import mozilla.components.feature.top.sites.DefaultTopSitesStorage
 import mozilla.components.feature.top.sites.PinnedSiteStorage
 import mozilla.components.feature.top.sites.TopSite
+import mozilla.components.feature_gpt.GptFragment
 import mozilla.components.service.glean.private.NoExtras
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import org.mozilla.fenix.GleanMetrics.Collections
@@ -46,6 +47,7 @@ import org.mozilla.fenix.ext.getRootView
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.ext.navigateSafe
 import org.mozilla.fenix.ext.openSetDefaultBrowserOption
+import org.mozilla.fenix.home.HomeMenu
 import org.mozilla.fenix.settings.deletebrowsingdata.deleteAndQuit
 import org.mozilla.fenix.utils.Do
 import org.mozilla.fenix.utils.Settings
@@ -388,6 +390,15 @@ class DefaultBrowserToolbarMenuController(
                         .show()
                 }
             }
+
+            is ToolbarMenu.Item.SummarizeGPT -> {
+                /*navController.nav(
+                    R.id.homeFragment,
+                    HomeFragmentDirections.openSummarizeGPTFragment(item.pageUrl),
+                )*/
+
+                GptFragment.show(item.fragmentManager, item.pageUrl.toString())
+            }
         }
     }
 
@@ -459,6 +470,10 @@ class DefaultBrowserToolbarMenuController(
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra("set_default_browser"))
             is ToolbarMenu.Item.RemoveFromTopSites ->
                 Events.browserMenuAction.record(Events.BrowserMenuActionExtra("remove_from_top_sites"))
+
+            is ToolbarMenu.Item.SummarizeGPT -> {
+                Events.browserMenuAction.record(Events.BrowserMenuActionExtra("summarize_with_gpt_api"))
+            }
         }
     }
 

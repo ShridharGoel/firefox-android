@@ -5,7 +5,9 @@
 package org.mozilla.fenix.home
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.content.ContextCompat.getColor
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +22,7 @@ import mozilla.components.browser.menu.item.BrowserMenuHighlightableItem
 import mozilla.components.browser.menu.item.BrowserMenuImageSwitch
 import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.concept.sync.AccountObserver
 import mozilla.components.concept.sync.AuthType
 import mozilla.components.concept.sync.OAuthAccount
@@ -28,6 +31,7 @@ import org.mozilla.fenix.Config
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.accounts.AccountState
 import org.mozilla.fenix.components.accounts.FenixAccountManager
+import org.mozilla.fenix.components.components
 import org.mozilla.fenix.components.toolbar.BrowserMenuSignIn
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
@@ -42,8 +46,10 @@ class HomeMenu(
     private val onItemTapped: (Item) -> Unit = {},
     private val onMenuBuilderChanged: (BrowserMenuBuilder) -> Unit = {},
     private val onHighlightPresent: (BrowserMenuHighlight) -> Unit = {},
+    private val fragmentManager: FragmentManager?
 ) {
     sealed class Item {
+        data class SummarizeGPT(val fragmentManager: FragmentManager, val pageUrl: Uri) : Item()
         object Bookmarks : Item()
         object History : Item()
         object Downloads : Item()
@@ -115,6 +121,17 @@ class HomeMenu(
     @Suppress("ComplexMethod")
     private fun coreMenuItems(): List<BrowserMenuItem> {
         val settings = context.components.settings
+
+        val gptItem = BrowserMenuImageText(
+            context.getString(R.string.browser_menu_gpt_option),
+            R.drawable.ic_launcher_foreground,
+            primaryTextColor,
+        ) {
+            val currentTabUrl = context.components.core.store.state.selectedTab?.content?.url
+            val pageUri = currentTabUrl?.let { Uri.parse(it) } ?: return@BrowserMenuImageText
+
+            fragmentManager?.let { Item.SummarizeGPT(it, pageUri) }?.let { onItemTapped.invoke(it) }
+        }
 
         val bookmarksItem = BrowserMenuImageText(
             context.getString(R.string.library_bookmarks),
@@ -209,6 +226,7 @@ class HomeMenu(
             historyItem,
             downloadsItem,
             extensionsItem,
+            gptItem,
             syncSignInMenuItem(),
             accountAuthItem,
             if (Config.channel.isMozillaOnline) manageAccountAndDevicesItem else null,

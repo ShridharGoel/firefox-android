@@ -7,6 +7,7 @@ package mozilla.components.browser.engine.gecko
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.view.WindowManager
 import androidx.annotation.VisibleForTesting
 import kotlinx.coroutines.CoroutineScope
@@ -212,8 +213,14 @@ class GeckoEngineSession(
      */
     override fun loadData(data: String, mimeType: String, encoding: String) {
         when (encoding) {
-            "base64" -> geckoSession.load(GeckoSession.Loader().data(data.toByteArray(), mimeType))
-            else -> geckoSession.load(GeckoSession.Loader().data(data, mimeType))
+            "base64" -> {
+                Log.d("GeckoEngineSession", "Testing 1 ${data.toByteArray()}")
+                geckoSession.load(GeckoSession.Loader().data(data.toByteArray(), mimeType))
+            }
+            else -> {
+                Log.d("GeckoEngineSession", "Testing 2 $data")
+                geckoSession.load(GeckoSession.Loader().data(data, mimeType))
+            }
         }
         notifyObservers { onLoadData() }
     }

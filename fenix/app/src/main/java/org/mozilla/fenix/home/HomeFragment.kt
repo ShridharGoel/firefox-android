@@ -542,6 +542,7 @@ class HomeFragment : Fragment() {
             navController = findNavController(),
             menuButton = WeakReference(binding.menuButton),
             hideOnboardingIfNeeded = ::hideOnboardingIfNeeded,
+            fragmentManager = childFragmentManager
         ).also { it.build() }
 
         tabCounterView = TabCounterView(
